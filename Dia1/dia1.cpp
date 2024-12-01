@@ -8,14 +8,14 @@
 
 #include <climits>
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <math.h>
 #include <sstream>
 #include <string>
-#include <climits>
 #include <utility>
 #include <vector>
-#include <math.h>
+
 using namespace std;
 
 // Ordenamos los dos vectores (filas) antes de calcular la distancia
@@ -38,8 +38,6 @@ int main(){
 	vector<int> fila2(n);
 
 	int pos = 0; // Lo usamos para saber en que posicion nos encontramos dentro del vector
-	int min_value1 = INT_MAX; // Está en la libreria de <climits>
-	int min_value2 = INT_MAX;
 	int diff = 0;
 	int res = 0;
 	
@@ -59,14 +57,16 @@ int main(){
 
 	BubbleSort(fila1);
 	BubbleSort(fila2);
-	// Imprimir fila 1
+	// Imprimir fila 1 ## debug ...
 	//for(int i = 0; i < n; i++){
 	//	cout << fila1[i] << endl;
 	//}
+	// parte 1
 	for (int i = 0; i < n; i++){
 		diff = abs(fila1[i] - fila2[i]);
 		res+=diff;
 	}
+	// parte 2
 	int multipl = 0;
 	for (int i = 0; i < n; i++){
 		int sum = 0;
