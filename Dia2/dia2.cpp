@@ -40,8 +40,10 @@ bool puedeConvertirseSafe (vector<int>& report){
     int n = report.size();
     for (int i = 0; i < n; i++){
         vector<int> Nvector = report;
-        // Solo hay que borrar el nivel de la posicion i
-        Nvector.erase(Nvector.begin() + i);
+        if(Safe(Nvector) == false) {
+            // Solo hay que borrar el nivel de la posicion i
+            Nvector.erase(Nvector.begin() + i);
+        }
         // Volvemos a comprobarlo:
         if(Safe(Nvector) == true){ return true; }
 
