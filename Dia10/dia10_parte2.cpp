@@ -6,14 +6,14 @@
 using namespace std;
 
 // Función para contar caminos distintos hacia la altura 9
-int countPaths(int r, int c, const vector<vector<int>>& grid, unordered_map<string, int>& memo) {
-    if (grid[r][c] == 9) {
+int countPaths(int i, int j, const vector<vector<int>>& vec, unordered_map<string, int>& nodo) {
+    if (vec[i][j] == 9) {
         return 1; // Se ha llegado a una altura 9
     }
 
-    string key = to_string(r) + "," + to_string(c);
-    if (memo.find(key) != memo.end()) {
-        return memo[key]; // Retornar resultado almacenado
+    string key = to_string(i) + "," + to_string(j);
+    if (nodo.find(key) != nodo.end()) {
+        return nodo[key]; // Retornar resultado almacenado
     }
 
     int paths = 0;
@@ -21,15 +21,14 @@ int countPaths(int r, int c, const vector<vector<int>>& grid, unordered_map<stri
     
     // Explorar vecinos
     for (auto d : dirs) {
-        int new_r = r + d.first;
-        int new_c = c + d.second;
-        if (new_r >= 0 && new_r < grid.size() && new_c >= 0 && new_c < grid[0].size() &&
-            grid[new_r][new_c] == grid[r][c] + 1) {
-            paths += countPaths(new_r, new_c, grid, memo);
+        int new_i = i + d.first;
+        int new_c = j + d.second;
+        if (new_i >= 0 && new_i < vec.size() && new_c >= 0 && new_c < vec[0].size() && vec[new_i][new_c] == vec[i][j] + 1) {
+            paths += countPaths(new_i, new_c, vec, nodo);
         }
     }
 
-    memo[key] = paths; // Almacenar resultado
+    nodo[key] = paths; // Almacenar resultado
     return paths;
 }
 
@@ -41,22 +40,22 @@ int main() {
     }
 
     string line;
-    vector<vector<int>> grid;
+    vector<vector<int>> vec;
     while (getline(file, line)) {
         vector<int> tmp;
         for (char c : line) {
             tmp.push_back(c - '0'); // Convertir char a int
         }
-        grid.push_back(tmp);
+        vec.push_back(tmp);
     }
 
     int totalRating = 0;
 
-    for (int r = 0; r < grid.size(); ++r) {
-        for (int c = 0; c < grid[0].size(); ++c) {
-            if (grid[r][c] == 0) { // Encontrar un trailhead
-                unordered_map<string, int> memo; // Para almacenar resultados de caminos
-                int rating = countPaths(r, c, grid, memo); // Contar caminos desde el trailhead
+    for (int i = 0; i < vec.size(); i++) {
+        for (int j = 0; j < vec[0].size(); j++) {
+            if (vec[i][j] == 0) { // Encontrar un trailhead
+                unordered_map<string, int> nodo; // Para almacenar resultados de caminos
+                int rating = countPaths(i, j, vec, nodo); // Contar caminos desde el trailhead
                 totalRating += rating; // Sumar el rating de este trailhead
             }
         }
