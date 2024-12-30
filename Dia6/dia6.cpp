@@ -1,100 +1,93 @@
-/***********************************************************************/
-/* 		Dia 1 : Ana Asenjo, Raquel Montoliu y Siya Wu                   */
-/***********************************************************************/
-/* Tenemos que recorrer un mapa para saber cuantas posiciones nuevas   */
-/* descubre el guardia, siguiendo las reglas de movimiento descritas   */
-/***********************************************************************/
-
-#include <climits>
-#include <cstdlib>
-#include <iostream>
+#include <algorithm>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <string>
-#include <climits>
-#include <utility>
+#include <unordered_set>
 #include <vector>
-#include <math.h>
+#include <utility> // Para std::pair
 using namespace std;
 
-struct guardia{
-    int x;
-    int y;
-    int distancia=0;
+struct Point {
+    Point(const int row = 0, const int col = 0) : row(row), col(col) {}
+    int row;
+    int col;
+    bool operator==(const Point& p) const {
+        return p.row == row && p.col == col;
+    }
 };
-enum direcciones {ARRIBA, ABAJO, IZQUIERDA, DERECHA}; // Como si fuera un diccionario
-bool fueralimit(vector<string> mapa, int x, int y){
-    if (x < 0 || y < 0 || x >= mapa.size() || y >= mapa[0].size()){
-        return true;
+
+// Hasher para unordered_set
+struct Hasher {
+    size_t operator()(const Point& p) const {
+        return hash<int>()(p.row) ^ (hash<int>()(p.col) << 1);
     }
-    return false;
-}
-direcciones turnRight(direcciones dir) {
-    return static_cast<direcciones>((dir + 1) % 4);
+};
+
+// Posibles movimientos
+const vector<Point> moves{
+    Point(1, 0),  // Abajo
+    Point(0, -1), // Izquierda
+    Point(-1, 0), // Arriba
+    Point(0, 1),  // Derecha
+};
+
+// Verifica si un punto está dentro del mapa
+const bool in_map(const Point& p, const vector<string>& map) {
+    return !(p.col >= map[0].size() || p.col < 0 || p.row >= map.size() || p.row < 0);
 }
 
-void localizacion(vector<string> mapa,guardia &g,direcciones dir){
-    for (int i = 0; i < mapa.size(); ++i){
-        for (int j = 0; j < mapa[0].size(); ++j){
-            if (mapa[i][j] == '^') { g = {i, j}; dir = ARRIBA; }
-            else if (mapa[i][j] == '>') { g = {i, j}; dir = DERECHA; }
-            else if (mapa[i][j] == 'v') { g = {i, j}; dir =ABAJO; }
-            else if (mapa[i][j] == '<') { g = {i, j}; dir = IZQUIERDA; }
-        }
+// Enumerate manual: devuelve un vector de pares (índice, elemento)
+template <typename T>
+vector<pair<size_t, typename T::value_type>> enumerate(const T& container) {
+    vector<pair<size_t, typename T::value_type>> result;
+    size_t idx = 0;
+    for (const auto& elem : container) {
+        result.emplace_back(idx++, elem);
     }
+    return result;
 }
-bool obstaculo(vector<string> mapa, int x, int y){
-    if(mapa[x][y]=='#'){
-        return true;
-    }
-    return false;
-}
-guardia movimiento(guardia g, direcciones dir){
-    if(dir==ARRIBA){
-        g.x--;
-    }
-    else if(dir==ABAJO){
-        g.x++;
-    }
-    else if(dir==IZQUIERDA){
-        g.y--;
-    }
-    else if(dir==DERECHA){
-        g.y++;
-    }
-return g;
-}
-int main(){
-    vector<string> mapa;
-    ifstream fich("input");
-    if (!fich.is_open()) {
-        cout << "Error al abrir el fichero\n";
-        exit(EXIT_FAILURE);
+
+int main(int argc, char* argv[]) {
+    string input = "input";
+    if (argc > 1) {
+        input = argv[1];
     }
 
+    ifstream file(input);
     string line;
-    while (getline(fich, line)) {
-        mapa.push_back(line);
-    }
-    guardia g;
-    direcciones dir;
-    localizacion(mapa,g,dir);
+    vector<string> map;
+    Point start;
 
-    while(!fueralimit(mapa,g.x,g.y)){
-        int x=g.x;
-        int y=g.y;
-        g=movimiento(g,dir);
-        if(obstaculo(mapa,g.x,g.y)){
-            dir=turnRight(dir);
-            g.x=x;
-            g.y=y;
-        }
-        if(mapa[g.x][g.y]=='.'){
-            mapa[g.x][g.y]='X';
-            g.distancia++;
+    // Leer el mapa y encontrar la posición inicial
+    while (getline(file, line)) {
+        map.push_back(line);
+        for (const auto& [idx, c] : enumerate(line)) {
+            if (c == '^') {
+                start.row = map.size() - 1;
+                start.col = idx;
+            }
         }
     }
-    cout<<g.distancia<<endl;
-    fich.close();
+
+    unordered_set<Point, Hasher> visited;
+    auto current = start;
+    visited.insert(current);
+    int idx = 2;
+
+    // Simulación del movimiento
+    while (true) {
+        const auto next = Point(current.row + moves[idx].row, current.col + moves[idx].col);
+        if (!in_map(next, map)) break;
+        if (map[next.row][next.col] != '#') {
+            visited.insert(next);
+            current = next;
+        } else {
+            idx += 1;
+            idx %= 4;
+        }
+    }
+int size=visited.size();
+    // Resultado
+    cout << size << '\n';
     return 0;
 }
