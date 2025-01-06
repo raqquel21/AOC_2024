@@ -5,7 +5,7 @@ Este problema permite explorar caminos en una matriz con restricciones, utilizan
 
 ## Técnicas y estructuras de datos empleadas
 - BFS: Para explorar caminos.
-- Memoización: Para contar rutas hacia el destino de manera eficiente.
+- Memorización: Para contar rutas hacia el destino de manera eficiente.
 - Vectores: Para almacenar la matriz y los movimientos posibles.
 
 ## Enfoque de la solución
